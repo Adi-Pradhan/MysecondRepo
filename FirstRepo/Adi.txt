@@ -1,0 +1,38 @@
+aditya: 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
+
+@GetMapping("/advertise/{Aid}")
+	public AdvertisementPostResponse f7(@PathVariable("Aid")int advertisementId){
+		AdvertisementPostResponse postResponse = new AdvertisementPostResponse();
+
+		Advertisement advt = this.service.getAdvertisementById(advertisementId);
+
+		RestTemplate restTemplate = new RestTemplate();
+		String url;
+
+		Category category;
+		url = "http://localhost:9052/advertise/getCategoryById/" + advt.getCategory().getId();
+		category = restTemplate.getForObject(url, Category.class);
+		advt.setCategory(category);
+		System.out.println("catagory" + advt);
+
+		url = "http://localhost:9052/advertise/status/" + advt.getAdvertisementStatus().getId();
+		AdvertisementStatus advertisementStatus;
+		advertisementStatus = restTemplate.getForObject(url, AdvertisementStatus.class);
+		advt.setAdvertisementStatus(advertisementStatus);
+
+		url = "http://localhost:9051/findUserById/" + advt.getOlxuser().getUserid();
+		OlxUser olxUser = restTemplate.getForObject(url, OlxUser.class);
+		advt.setOlxuser(olxUser);
+
+		postResponse.setId(advt.getId());
+		postResponse.setTitle(advt.getTitle());
+		postResponse.setDescription(advt.getDescription());
+		postResponse.setPrice(advt.getPrice());
+		postResponse.setUserName(advt.getOlxuser().getUsername());
+		postResponse.setCategory(advt.getCategory().getName());
+		postResponse.setCreateDate(advt.getCreatedDate());
+		postResponse.setModifiedDate(advt.getModifiedDate());
+		postResponse.setStatus(advt.getAdvertisementStatus().getStatus());
+
+		return postResponse;
+	}
